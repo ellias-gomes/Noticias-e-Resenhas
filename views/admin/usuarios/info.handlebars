@@ -1,0 +1,29 @@
+<div class="container mt-4 mb-4">
+    <h1 class="display-6 fw-bold">{{user.nome}}</h1>
+    <hr>
+    <div class="row align-items-start">
+        <div class="col-12 col-md-6 col-lg-3 mb-3">
+            <h4>Nome de usuário:</h4>
+            <p>{{user.nome}}</p>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3 mb-3">
+            <h4>E-mail do usuário:</h4>
+            <p>{{user.email}}</p>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3 mb-3">
+            <h4>Data de criação:</h4>
+            <p>{{formatDate user.data}}</p>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3 mb-3">
+            <h4>Imagem de perfil:</h4>
+            <img src="{{imageUrl user._id 'user'}}" onerror="this.onerror=null;this.src='/img/icon.svg';" alt="Imagem de perfil" class="imgUser rounded mb-3 d-block">
+            {{#if isOwnProfile}}
+                <form action="/uploadperfil" method="POST" enctype="multipart/form-data">
+                    <label for="file" class="form-label small">Alterar foto de perfil:</label>
+                    <input type="file" id="file" name="file" accept="image/*" class="form-control form-control-sm mb-2" required>
+                    <input type="submit" value="Atualizar Foto" class="btn btn-dark btn-sm w-100">
+                </form>
+            {{/if}}
+        </div>
+    </div>
+</div>

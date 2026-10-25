@@ -1,0 +1,56 @@
+<div class="container mt-4">
+    <h1 class="display-6 fw-bold">Postagens</h1>
+    <hr>
+    <div class="row">
+        <div class="col-12 col-md-3">
+            <a href="/admin/postagens/add"><button class="btn btn-secondary w-100 mb-2">Nova Postagem</button></a>
+            <p class="text-justify">Gerencie as notícias e postagens publicadas no portal. Adicione novas matérias com imagem de capa, edite conteúdos ou destaque no carousel.</p>
+        </div>
+        <div class="col-12 col-md-9 text-center">
+            <div class="row">
+                {{#each postagens}}
+                    <div class="container mt-2 col-12 col-lg-6 pb-3 listagem">
+                        <h4>{{titulo}}</h4>
+                        <small>{{slug}}</small><br>
+                        <small>{{formatDate date}}</small><br>
+                        {{#if categoria}}
+                            <small class="badge bg-secondary">{{categoria.nome}}</small><br>
+                        {{else}}
+                            <small class="badge bg-warning text-dark">Sem categoria</small><br>
+                        {{/if}}
+                        <a href="/post/{{slug}}"><button class="btn btn-success mt-2 w-75">Ler postagem</button></a>
+                        <a href="/admin/postagens/edit/{{_id}}"><button class="btn btn-primary mt-2 w-75">Editar postagem</button></a>
+                        <button type="button" class="btn btn-danger mt-2 w-75" data-bs-toggle="modal" data-bs-target="#modalDeletar{{_id}}">Deletar postagem</button>
+                    </div>
+                    <!-- Modal -->
+                    <div class="modal fade" id="modalDeletar{{_id}}" tabindex="-1" aria-labelledby="modalDeletar" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Deseja deletar a postagem?</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-start">
+                                Tem certeza que deseja deletar a postagem "{{titulo}}"?
+                            </div>
+                            <div class="modal-footer">
+                                <form action="/admin/postagens/deletar/" method="POST">
+                                    <input type="hidden" name="id" value="{{_id}}">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                    <button type="submit" class="btn btn-danger">
+                                        <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg>
+                                    </button>
+                                </form>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{else}}
+                    <div class="container text-center">
+                        <h4 class="mt-2">Nenhuma postagem registrada!</h4>
+                    </div>
+                {{/each}}
+            </div>
+        </div>
+    </div>
+</div>

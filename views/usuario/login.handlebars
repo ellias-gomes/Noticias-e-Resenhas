@@ -1,0 +1,20 @@
+<div class="container mt-4">
+    <h1 class="display-6 fw-bold">Entrar em uma conta</h1>
+    <hr>
+    <form action="/users/login" method="post" class="row justify-content-center">
+        <div class="row d-flex justify-content-center">
+            <div class="col-12 col-md-4 mb-2 text-start">
+                <label for="email">E-mail: </label>
+                <input type="email" name="email" id="email" placeholder="E-mail de usuario" class="form-control mt-1 mb-2">
+                <label for="senha">Senha: </label>
+                <input type="password" name="senha" id="senha" placeholder="Senha de usuario" class="form-control mt-1 mb-1">
+                <label for=""><a href="/users/password">Esqueci minha senha</a></label>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center mt-2">
+            <div class="col-12 col-md-4 mb-2 text-center">
+                <input type="submit" class="btn btn-success col-5" value="Acessar conta">
+            </div>
+        </div>
+    </form>
+</div>

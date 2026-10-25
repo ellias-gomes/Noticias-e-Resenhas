@@ -1,0 +1,35 @@
+{{#each erros}}
+    <div class="alert alert-danger container mt-2">{{texto}}</div>
+    {{else}}
+{{/each}}
+<div class="container mt-4">
+    <h1 class="display-6 fw-bold">Registrar nova conta</h1>
+    <hr>
+    <form action="" method="post" class="row justify-content-center">
+        <div class="row d-flex justify-content-center">
+            <div class="col-12 col-md-4 mb-2 text-start">
+                <label for="nome">Nome: </label>
+                <input type="text" name="nome" id="nome" placeholder="Nome de usuario" class="form-control mt-1 mb-2" required>
+                <label for="email">E-mail: </label>
+                <input type="email" name="email" id="email" placeholder="E-mail de usuario" class="form-control mt-1 mb-2" required>
+                <label for="senha">Senha: </label>
+                <input type="password" name="senha" id="senha" placeholder="Senha de usuario" class="form-control mt-1 mb-2" required>
+                <label for="senha2">Repita a senha: </label>
+                <input type="password" name="senha2" id="senha2" placeholder="Confirmação de senha de usuario" class="form-control mt-1 mb-2" required>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center mt-2">
+            <div class="col-12 col-md-4 mb-2">
+                <label for="inputNovidades" class="form-check-label">
+                    <input type="checkbox" name="novidades" id="inputNovidades" class="form-check-input" required>
+                    Desejo receber confirmação por e-mail.
+                </label>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center mt-2 text-center">
+            <div class="col-12 col-md-4 mb-2">
+                <input type="submit" class="btn btn-success col-5" value="Criar conta">
+            </div>
+        </div>
+    </form>
+</div>

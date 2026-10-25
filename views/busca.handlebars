@@ -1,0 +1,25 @@
+<div class="container mt-4">
+    <h1 class="display-6 fw-bold">Resultados da busca{{#if searchTerm}}: "{{searchTerm}}"{{/if}}</h1>
+    <hr>
+    {{#if results.length}}
+        {{#each results}}
+            <div class="card mb-3 text-dark bg-light border-light shadow-sm">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="{{imageUrl slug 'post'}}" onerror="this.onerror=null;this.src='/img/slide.jpg';" alt="Imagem Thumb" class="img-fluid rounded-start w-100" style="aspect-ratio: 2/1; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h3 class="card-title">{{titulo}}</h3>
+                            <p class="mb-1 card-text">{{descricao}}</p>
+                            <small class="text-muted">Data de publicação: {{formatDate date}}</small><br>
+                            <a href="/post/{{slug}}" class="btn stretched-link"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {{/each}}
+    {{else}}
+        <p>Nenhum resultado encontrado.</p>
+    {{/if}}
+</div>

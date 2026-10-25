@@ -1,0 +1,51 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <img src="/img/newspaper-regular.svg" alt="" width="30" height="24">
+        </a>
+        <a class="navbar-brand fw-bold" href="/">Notícias</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link fw-bold" href="/admin">Admin</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle fw-bold" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Categorias
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        {{#each categorias}}
+                            <li><a class="dropdown-item" href="/categoria/{{slug}}">{{nome}}</a></li>
+                            {{else}}
+                                <li><p class="dropdown-item mb-0 pe-none">Nenhuma categoria</p></li>
+                        {{/each}}
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle fw-bold" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Perfil
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        {{#if user}}
+                            <li><a class="dropdown-item" href="/users/usuario/{{userId}}">Minha conta</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/users/sair">Sair</a></li>
+                            {{else}}
+                                <li><a class="dropdown-item" href="/users/registro">Registro</a></li>
+                                <li><a class="dropdown-item" href="/users/login">Login</a></li>
+                        {{/if}}
+                    </ul>
+                </li>
+            </ul>
+            <form class="d-flex" action="/search" method="get">
+                <input class="form-control me-2" type="search" placeholder="Pesquisar..." aria-label="Pesquisar..." name="pesquisa">
+                <button class="btn btn-dark pt-0" type="submit">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><style>svg{fill:#ffffff}</style><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>

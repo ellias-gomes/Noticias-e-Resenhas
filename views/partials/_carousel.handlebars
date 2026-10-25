@@ -1,0 +1,38 @@
+<div id="carousel" class="carousel slide" data-bs-ride="carousel">
+    {{#if carouselPosts.length}}
+        <div class="carousel-indicators">
+            {{#each carouselPosts}}
+                <button type="button" data-bs-target="#carousel" data-bs-slide-to="{{@index}}" {{#if @first}}class="active" aria-current="true"{{/if}} aria-label="Slide {{@index}}"></button>
+            {{/each}}
+        </div>
+    {{/if}}
+    <div class="carousel-inner">
+        {{#each carouselPosts}}
+            <div class="carousel-item {{#if @first}}active{{/if}}">
+                <a href="/post/{{slug}}" class="text-decoration-none">
+                    <img src="{{imageUrl slug 'post'}}" onerror="this.onerror=null;this.src='/img/slide.jpg';" class="d-block carousel" alt="{{titulo}}">
+                    <div class="carousel-caption d-none d-md-block text-light">
+                        <h3 class="bg-dark mb-0 bg-opacity-75 rounded-top py-1 px-2">{{titulo}}</h3>
+                        <p class="bg-dark mt-0 bg-opacity-75 rounded-bottom py-1 px-2">{{descricao}}</p>
+                    </div>
+                </a>
+            </div>
+        {{else}}
+            <div class="carousel-item active">
+                <img src="/img/slide.jpg" class="d-block carousel" alt="Notícias">
+                <div class="carousel-caption d-none d-md-block text-light">
+                    <h3 class="bg-dark mb-0 bg-opacity-75 rounded-top py-1">Portal de Notícias</h3>
+                    <p class="bg-dark mt-0 bg-opacity-75 rounded-bottom py-1">Acompanhe as principais notícias atualizadas</p>
+                </div>
+            </div>
+        {{/each}}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Anterior</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Próximo</span>
+    </button>
+</div>

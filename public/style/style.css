@@ -1,0 +1,111 @@
+::selection{
+    background-color: #6c757d;
+    color: #fff;
+}
+
+::-webkit-scrollbar {
+	width: 10px;
+}
+
+::-webkit-scrollbar-track {
+	background: #f1f1f1; 
+}
+
+::-webkit-scrollbar-thumb {
+	background: #888; 
+	border-radius: 1rem;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #555;
+}
+
+/* index carousel */
+img.carousel{
+    width: 100%;
+    max-height: auto;
+    aspect-ratio: 32/9;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* user img */
+img.imgUser{
+    width: 15rem;
+    height: auto;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* img postagem thumb */
+
+@media only screen and (max-width: 767px){
+    :root{
+        --width-thumb: 100%;
+        --height-thumb: 56.25%;
+    }
+}
+@media only screen and (min-width: 768px){
+    :root{
+        --width-thumb: 100%;
+    }
+}
+
+.imgThumb{
+    width: var(--width-thumb);
+    height: auto;
+    aspect-ratio: 64/9;
+    object-fit: cover;
+    object-position: center;
+}
+.imgThumb:hover{
+    width: calc(var(--width-thumb) + 1%);
+    height: auto;
+    transition: 0.3s;
+}
+
+.text-justify{
+    text-align: justify;
+    word-wrap: break-word;
+    font-size: 13pt;
+    white-space: pre-wrap;
+}
+
+.imgComments{
+    width: 5rem;
+    height: auto;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 50%;
+}
+
+/* rodapé */
+#footer{
+    background-color: #343a40;
+}
+
+.menu-rodape ul {
+    list-style: none;
+}
+  
+.menu-rodape ul li {
+    display: inline;
+}
+  
+.menu-rodape ul li a {
+    padding: 0rem 2rem;
+    color: #eee;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 1rem;
+}
+
+.rodape ul {
+    list-style: none;
+}
+  
+.rodape ul li {
+    display: inline;
+}

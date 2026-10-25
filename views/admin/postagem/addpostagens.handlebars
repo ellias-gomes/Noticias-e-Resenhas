@@ -1,0 +1,75 @@
+{{#each erros}}
+    <div class="alert alert-danger container mt-2">
+        {{texto}}
+    </div>
+{{/each}}
+<div class="container mt-4 mb-4">
+    <h1 class="display-6 fw-bold">Nova Postagem</h1>
+    <hr>
+    <form action="/admin/postagens/nova" method="post" class="row justify-content-center" enctype="multipart/form-data">
+        <div class="row d-flex justify-content-center">
+            <div class="col-12 col-md-4 mb-2 text-start">
+                <label for="titulo">Título: </label>
+                <input type="text" name="titulo" id="titulo" placeholder="Nome da postagem" class="form-control mt-1" required>
+            </div>
+            <div class="col-12 col-md-4 mb-2 text-start">
+                <label for="slug">Slug: </label>
+                <input type="text" name="slug" id="slug" placeholder="Slug da postagem" class="form-control mt-1" required>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center">
+            <div class="col-12 col-md-8 mb-2 text-start">
+                <label for="descricao">Descrição: </label>
+                <input type="text" name="descricao" id="descricao" placeholder="Descrição da postagem" class="form-control mt-1" required>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center">
+            <div class="col-12 col-md-8 mb-2 text-start">
+                <label for="conteudo">Conteúdo: </label>
+                <textarea name="conteudo" id="conteudo" cols="30" rows="8" placeholder="Conteúdo da postagem" class="form-control"></textarea>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center">
+            <div class="col-12 col-md-2 mb-2 text-start">
+                <label for="fonte">Fonte: </label>
+                <input type="text" name="fonte" id="fonte" placeholder="Fonte da postagem" class="form-control mt-1" required>
+            </div>
+            <div class="col-12 col-md-2 mb-2 text-start">
+                <label for="categoria">Categoria: </label>
+                <select name="categoria" id="categoria" class="form-select mt-1" required>
+                    {{#each categorias}}
+                        <option value="{{_id}}">{{nome}}</option>
+                    {{else}}
+                        <option value="0">Nenhuma categoria registrada</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="col-12 col-md-1 mb-2 text-start">
+                <label for="carousel">Carousel: </label>
+                <select name="carousel" id="carousel" class="form-select mt-1" required>
+                    <option value="true">Sim</option>
+                    <option value="false">Não</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-3 mb-2 text-start">
+                <label for="file">Imagem:</label>
+                <input type="file" id="file" name="file" accept="image/*" class="form-control mt-1 mb-2" required>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center mt-2">
+            <div class="col-12 col-md-4 text-center mb-2">
+                <input type="submit" class="btn btn-success col-6" value="Criar postagem">
+            </div>
+        </div>
+    </form>
+</div>
+<script src="/tinymce/tinymce.min.js"></script>
+<script>
+    tinymce.init({
+        selector: 'textarea',
+        plugins: 'link image code lists',
+        toolbar: 'undo redo | bold italic | bullist numlist | link image | code',
+        promotion: false,
+        branding: false
+    });
+</script>

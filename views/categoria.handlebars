@@ -1,0 +1,23 @@
+<div class="container mt-4">
+    <h1 class="display-6 fw-bold">{{categoria.nome}}</h1>
+    <hr>
+    {{#each postagens}}
+        <div class="card mb-3 text-dark bg-light border-light shadow-sm">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="{{imageUrl slug 'post'}}" onerror="this.onerror=null;this.src='/img/slide.jpg';" alt="Imagem Thumb" class="img-fluid rounded-start w-100" style="aspect-ratio: 2/1; height: 100%; object-fit: cover;">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h3 class="card-title">{{titulo}}</h3>
+                        <p class="mb-1 card-text">{{descricao}}</p>
+                        <small class="text-muted">Data de publicação: {{formatDate date}}</small><br>
+                        <a href="/post/{{slug}}" class="btn stretched-link ms-0"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{else}}
+        <h5>Nenhuma postagem nesta categoria!</h5>
+    {{/each}}
+</div>

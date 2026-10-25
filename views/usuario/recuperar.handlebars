@@ -1,0 +1,23 @@
+<div class="container mt-4">
+    <h1 class="display-6 fw-bold">Alterar senha</h1>
+    <hr>
+    <form action="/users/password/alterar" method="post" class="row justify-content-center">
+        <div class="row d-flex justify-content-center">
+            <div class="col-12 col-md-4 mb-2 text-start">
+                <input type="hidden" name="id" value="{{user._id}}">
+                <input type="hidden" name="token" value="{{token}}">
+                <label for="email">E-mail: </label>
+                <input type="email" name="email" id="email" placeholder="E-mail de usuário" class="form-control mt-1 mb-2" value="{{user.email}}" readonly>
+                <label for="senha">Nova senha: </label>
+                <input type="password" name="senha" id="senha" placeholder="Nova senha (mín. 5 caracteres)" class="form-control mt-1 mb-1" required>
+                <label for="senha2">Confirmar senha: </label>
+                <input type="password" name="senha2" id="senha2" placeholder="Repita a nova senha" class="form-control mt-1 mb-1" required>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center mt-2">
+            <div class="col-12 col-md-4 mb-2 text-center">
+                <input type="submit" class="btn btn-success col-5" value="Alterar senha">
+            </div>
+        </div>
+    </form>
+</div>

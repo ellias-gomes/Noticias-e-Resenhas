@@ -1,0 +1,18 @@
+<div class="container mt-2 mb-4">
+    <h3 class="mb-3">Talvez você tenha interesse:</h3>
+    <div class="row g-3">
+        {{#each postagens}}
+            <div class="col-12 col-md-4 col-lg-3">
+                <div class="card h-100 border-light shadow-sm">
+                    <img src="{{imageUrl slug 'post'}}" onerror="this.onerror=null;this.src='/img/slide.jpg';" class="card-img-top" alt="{{titulo}}" style="aspect-ratio: 16/9; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <h6 class="card-title mb-1">{{titulo}}</h6>
+                        <a href="/post/{{slug}}" class="stretched-link"></a>
+                    </div>
+                </div>
+            </div>
+        {{else}}
+            <div class="col-12">Nenhuma recomendação!</div>
+        {{/each}}
+    </div>
+</div>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/css/bootstrap.css">
+        <link rel="stylesheet" href="/style/style.css">
+        <link rel="shortcut icon" href="/img/newspaper-regular.svg" type="image/x-icon">
+        <title>Notícias</title>
+    </head>
+    <body class="d-flex flex-column min-vh-100">
+        {{>_navbar}}
+        {{#if error}}
+            <div class="alert alert-danger container mt-2">{{error}}</div>
+        {{/if}}
+        {{>_msg}}
+        {{#if carousel}}
+            {{>_carousel}}
+        {{/if}}
+
+        <main class="flex-grow-1">
+            {{{body}}}
+        </main>
+
+        {{>_footer}}
+
+        <!-- Bootstrap JS Local -->
+        <script src="/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

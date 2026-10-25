@@ -1,0 +1,24 @@
+{{#each erros}}
+    <div class="alert alert-danger container mt-2">
+        {{texto}}
+    </div>
+{{/each}}
+<div class="container mt-4">
+    <h1 class="display-6 fw-bold">Nova Categoria</h1>
+    <hr>
+    <form action="/admin/categorias/nova" method="post" class="row justify-content-center">
+        <div class="row d-flex justify-content-center">
+            <div class="col-12 col-md-6 mb-2 text-start">
+                <label for="nome">Nome: </label>
+                <input type="text" name="nome" id="nome" placeholder="Nome da categoria" class="form-control mt-1 mb-2">
+                <label for="slug">Slug: </label>
+                <input type="text" name="slug" id="slug" placeholder="Slug da categoria" class="form-control  mt-1 mb-2">
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center">
+            <div class="col-12 col-md-4 mb-4 text-center">
+                <input type="submit" class="btn btn-success col-5" value="Criar categoria">
+            </div>
+        </div>
+    </form>
+</div>

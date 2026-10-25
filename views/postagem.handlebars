@@ -1,0 +1,26 @@
+<div class="container mt-4">
+    <h1 class="display-6 fw-bold">{{postagem.titulo}}</h1>
+    <hr>
+    <div class="row">
+        <div class="col-12">
+            <p class="text-center fs-6">{{postagem.descricao}}</p>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-12">
+            <img src="{{imageUrl postagem.slug 'post'}}" onerror="this.onerror=null;this.src='/img/slide.jpg';" alt="{{postagem.descricao}}" class="carousel rounded">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div>{{{postagem.conteudo}}}</div>
+        </div>
+    </div>
+    <hr>
+    <small>Fonte: {{postagem.fonte}}</small><br>
+    <small>Data de publicação: {{formatDate postagem.date}}</small>
+</div>
+<hr class="container">
+{{>_comments}}
+<hr class="container">
+{{>_recomendacoes}}
