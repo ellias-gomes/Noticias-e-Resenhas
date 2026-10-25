@@ -1,4 +1,4 @@
-<div id="carousel" class="carousel slide" data-bs-ride="carousel">
+<div id="carousel" class="carousel slide hero-carousel-wrapper" data-bs-ride="carousel">
     {{#if carouselPosts.length}}
         <div class="carousel-indicators">
             {{#each carouselPosts}}
@@ -10,19 +10,32 @@
         {{#each carouselPosts}}
             <div class="carousel-item {{#if @first}}active{{/if}}">
                 <a href="/post/{{slug}}" class="text-decoration-none">
-                    <img src="{{imageUrl slug 'post'}}" onerror="this.onerror=null;this.src='/img/slide.jpg';" class="d-block carousel" alt="{{titulo}}">
-                    <div class="carousel-caption d-none d-md-block text-light">
-                        <h3 class="bg-dark mb-0 bg-opacity-75 rounded-top py-1 px-2">{{titulo}}</h3>
-                        <p class="bg-dark mt-0 bg-opacity-75 rounded-bottom py-1 px-2">{{descricao}}</p>
+                    <img src="{{img}}" onerror="this.onerror=null;this.src='{{imageUrl slug 'post'}}';" class="d-block carousel" alt="{{titulo}}">
+                    <div class="carousel-caption hero-caption-box text-light">
+                        <div class="container">
+                            {{#if categoria}}
+                                <span class="badge-category mb-2">{{categoria.nome}}</span>
+                            {{else}}
+                                <span class="badge-category mb-2">DESTAQUE</span>
+                            {{/if}}
+                            <h2 class="fw-bolder text-white mb-2 display-6">{{titulo}}</h2>
+                            <p class="mb-2 text-light opacity-75 d-none d-md-block col-lg-8">{{descricao}}</p>
+                            <div class="small text-warning fw-semibold">
+                                <span>Por {{autor}}</span> • <span>{{formatDate date}}</span> • <span>{{readingTime conteudo}}</span>
+                            </div>
+                        </div>
                     </div>
                 </a>
             </div>
         {{else}}
             <div class="carousel-item active">
                 <img src="/img/slide.jpg" class="d-block carousel" alt="Notícias">
-                <div class="carousel-caption d-none d-md-block text-light">
-                    <h3 class="bg-dark mb-0 bg-opacity-75 rounded-top py-1">Portal de Notícias</h3>
-                    <p class="bg-dark mt-0 bg-opacity-75 rounded-bottom py-1">Acompanhe as principais notícias atualizadas</p>
+                <div class="carousel-caption hero-caption-box text-light">
+                    <div class="container">
+                        <span class="badge-category mb-2">PORTAL DE NOTÍCIAS</span>
+                        <h2 class="fw-bolder text-white mb-2">Informação em Tempo Real</h2>
+                        <p class="mb-0 text-light opacity-75">Acompanhe, curta, comente e compartilhe as principais matérias do dia.</p>
+                    </div>
                 </div>
             </div>
         {{/each}}

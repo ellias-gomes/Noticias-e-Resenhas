@@ -1,43 +1,70 @@
-<div class="container mt-2 mb-2">
-    <h3 class="mb-3">Comentários</h3>
+<div class="container mt-4 mb-3" id="comentarios">
+    <div class="section-header">
+        <h3 class="fw-bold mb-0">Comentários da Comunidade ({{comentario.length}})</h3>
+    </div>
 
-    <!--COMENTARIOS-->
-    <div>
-        {{#each comentario}}
-            <div class="row mb-3 mt-3 align-items-center">
-                <div class="col-3 col-sm-2 col-lg-1">
-                    <img src="{{imageUrl userId 'user'}}" onerror="this.onerror=null;this.src='/img/icon.svg';" alt="Imagem de perfil" class="imgComments">
-                </div>
-                <div class="col-9 col-sm-10 col-lg-11">
-                    <div class="row text-break">
-                        <h5 class="mb-0">{{usuario}} <small class="text-muted fs-6 fw-normal">• {{formatDate date}}</small></h5>
+    <!-- ADICIONAR COMENTÁRIO -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+            {{#if user}}
+                <form action="/posts/{{postagem.slug}}/addcomentario" method="post">
+                    <input type="hidden" name="postagem" id="postagem" value="{{postagem._id}}">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <img src="{{imageUrl user._id 'user'}}" onerror="this.onerror=null;this.src='/img/icon.svg';" alt="Avatar" width="32" height="32" class="rounded-circle" style="object-fit: cover; border: 2px solid #FFB800;">
+                        <span class="fw-bold small">Comentando como {{user.nome}}</span>
                     </div>
-                    <div class="row text-break"><p class="mb-0 mt-1">{{comentario}}</p></div>
+                    <div class="mb-3">
+                        <textarea name="comentario" id="comentario" rows="3" placeholder="Participe da discussão! Qual a sua opinião sobre esta notícia?" class="form-control" required></textarea>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-yellow px-4">
+                            Publicar Comentário
+                        </button>
+                    </div>
+                </form>
+            {{else}}
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 py-2">
+                    <div>
+                        <h6 class="fw-bold mb-1">Quer participar da conversa?</h6>
+                        <p class="text-muted small mb-0">Entre na sua conta ou cadastre-se gratuitamente para comentar e curtir notícias.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="/users/login" class="btn btn-dark btn-sm px-3">Entrar</a>
+                        <a href="/users/registro" class="btn btn-yellow btn-sm px-3">Criar Conta</a>
+                    </div>
+                </div>
+            {{/if}}
+        </div>
+    </div>
+
+    <!-- LISTA DE COMENTÁRIOS -->
+    <div class="d-flex flex-column gap-3">
+        {{#each comentario}}
+            <div class="comment-card">
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div class="d-flex align-items-start gap-3">
+                        <img src="{{imageUrl userId 'user'}}" onerror="this.onerror=null;this.src='/img/icon.svg';" alt="Imagem de perfil" class="imgComments">
+                        <div>
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <h6 class="fw-bold mb-0">{{usuario}}</h6>
+                                <small class="text-muted">• {{formatDate date}}</small>
+                            </div>
+                            <p class="mb-0 mt-2 text-break">{{comentario}}</p>
+                        </div>
+                    </div>
+                    {{#if canDelete}}
+                        <form action="/posts/{{../postagem.slug}}/delcomentario/{{_id}}" method="POST" onsubmit="return confirm('Deseja remover este comentário?');">
+                            <button type="submit" class="btn btn-outline-danger btn-sm border-0" title="Excluir comentário">
+                                ✕
+                            </button>
+                        </form>
+                    {{/if}}
                 </div>
             </div>
         {{else}}
-            <div class="row mb-3 mt-3">
-                <div class="col-12">
-                    <p>Nenhum comentário!</p>
-                </div>
+            <div class="text-center py-4 text-muted bg-white rounded-3 border">
+                <p class="mb-0">Seja o primeiro a comentar nesta publicação!</p>
             </div>
         {{/each}}
-    </div>
-
-    <!--ADICIONAR COMENTARIO-->
-    <div>
-        <form action="/posts/{{postagem.slug}}/addcomentario" method="post">
-            <input type="hidden" name="postagem" id="postagem" value="{{postagem._id}}">
-            <div class="row d-flex justify-content-left">
-                <div class="col-12 mb-2">
-                    <textarea name="comentario" id="comentario" rows="3" placeholder="Escreva seu comentário..." class="form-control" required></textarea>
-                </div>
-            </div>
-            <div class="row d-flex text-end">
-                <div class="col-12">
-                    <input type="submit" value="Enviar" class="btn btn-success col-12 col-md-4 col-lg-2">
-                </div>
-            </div>
-        </form>
     </div>
 </div>

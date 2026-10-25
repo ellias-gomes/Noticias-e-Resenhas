@@ -1,16 +1,47 @@
-<footer class="position-{{position}} bottom-0 w-100 mt-4">
-    <div class="text-light text-center w-100 mb-0 sticky-bottom" id="footer">
-        <span>Todos os direitos reservados © 2023</span>
-    </div>
-    <div class="w-100 bg-dark text-light rodape mb-0 p-2 sticky-bottom">
-        <nav class="menu-rodape">
-            <ul>
-                <li><a href="/">Página inicial</a></li>
-                <li><a href="/users/login">Login</a></li>
-                <li><a href="/users/registro">Registro</a></li>
-                <li><a href="https://facebook.com" target="_blank">Facebook</a></li>
-                <li><a href="https://instagram.com" target="_blank">Instagram</a></li>
-            </ul>
-        </nav>
+<footer class="footer-editorial mt-5 pt-5 pb-4">
+    <div class="container">
+        <div class="row g-4 pb-4 border-bottom border-secondary border-opacity-25">
+            <div class="col-12 col-md-5">
+                <div class="brand-logo-box mb-3">
+                    <span class="brand-icon-badge">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 512 512"><path d="M96 96c0-35.3 28.7-64 64-64H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H80c-44.2 0-80-35.8-80-80V128c0-17.7 14.3-32 32-32s32 14.3 32 32V400c0 8.8 7.2 16 16 16s16-7.2 16-16V96zm64 24v80c0 13.3 10.7 24 24 24H296c13.3 0 24-10.7 24-24V120c0-13.3-10.7-24-24-24H184c-13.3 0-24 10.7-24 24zm208-8c0 8.8 7.2 16 16 16h48c8.8 0 16-7.2 16-16s-7.2-16-16-16H384c-8.8 0-16 7.2-16 16zm0 96c0 8.8 7.2 16 16 16h48c8.8 0 16-7.2 16-16s-7.2-16-16-16H384c-8.8 0-16 7.2-16 16zM160 304c0 8.8 7.2 16 16 16H432c8.8 0 16-7.2 16-16s-7.2-16-16-16H176c-8.8 0-16 7.2-16 16zm0 96c0 8.8 7.2 16 16 16H432c8.8 0 16-7.2 16-16s-7.2-16-16-16H176c-8.8 0-16 7.2-16 16z"/></svg>
+                    </span>
+                    <span class="brand-title">FOCO<span>NEWS</span></span>
+                </div>
+                <p class="small text-secondary mb-3">
+                    Jornalismo independente, dinâmico e interativo. Acompanhe as principais notícias, comente, curta e compartilhe informação de verdade.
+                </p>
+            </div>
+            <div class="col-6 col-md-3">
+                <h6 class="text-uppercase fw-bold mb-3" style="color: #FFB800;">Editorias</h6>
+                <ul class="list-unstyled small d-flex flex-column gap-2">
+                    {{#each categorias}}
+                        <li><a href="/categoria/{{slug}}">{{nome}}</a></li>
+                    {{else}}
+                        <li class="text-muted">Sem categorias</li>
+                    {{/each}}
+                </ul>
+            </div>
+            <div class="col-6 col-md-4">
+                <h6 class="text-uppercase fw-bold mb-3" style="color: #FFB800;">Acesso Rápido</h6>
+                <ul class="list-unstyled small d-flex flex-column gap-2">
+                    <li><a href="/">Página Inicial</a></li>
+                    {{#if user}}
+                        <li><a href="/users/usuario/{{userId}}">Minha Conta ({{user.nome}})</a></li>
+                        {{#if isAdmin}}
+                            <li><a href="/admin">Painel do Administrador</a></li>
+                        {{/if}}
+                        <li><a href="/users/sair">Encerrar Sessão</a></li>
+                    {{else}}
+                        <li><a href="/users/login">Entrar na Conta</a></li>
+                        <li><a href="/users/registro">Criar Nova Conta</a></li>
+                    {{/if}}
+                </ul>
+            </div>
+        </div>
+        <div class="d-flex flex-wrap justify-content-between align-items-center pt-3 small text-secondary">
+            <span>© 2026 <strong>FocoNews</strong> • Todos os direitos reservados.</span>
+            <span>Identidade Editorial <span style="color: #FFB800;">●</span> Edição Digital</span>
+        </div>
     </div>
 </footer>

@@ -1,25 +1,41 @@
-<div class="container mt-4">
-    <h1 class="display-6 fw-bold">Resultados da busca{{#if searchTerm}}: "{{searchTerm}}"{{/if}}</h1>
-    <hr>
+<div class="container mt-4 mb-5">
+    <div class="section-header">
+        <h1 class="h3 fw-bold mb-0">Resultados da busca{{#if searchTerm}}: "{{searchTerm}}"{{/if}}</h1>
+    </div>
+
     {{#if results.length}}
         {{#each results}}
-            <div class="card mb-3 text-dark bg-light border-light shadow-sm">
+            <article class="news-card mb-4 position-relative">
                 <div class="row g-0">
-                    <div class="col-md-4">
-                        <img src="{{imageUrl slug 'post'}}" onerror="this.onerror=null;this.src='/img/slide.jpg';" alt="Imagem Thumb" class="img-fluid rounded-start w-100" style="aspect-ratio: 2/1; height: 100%; object-fit: cover;">
+                    <div class="col-md-4 news-card-img-wrap">
+                        <img src="{{img}}" onerror="this.onerror=null;this.src='{{imageUrl slug 'post'}}';" alt="{{titulo}}" class="news-card-img">
                     </div>
                     <div class="col-md-8">
-                        <div class="card-body">
-                            <h3 class="card-title">{{titulo}}</h3>
-                            <p class="mb-1 card-text">{{descricao}}</p>
-                            <small class="text-muted">Data de publicação: {{formatDate date}}</small><br>
-                            <a href="/post/{{slug}}" class="btn stretched-link"></a>
+                        <div class="card-body p-4 d-flex flex-column justify-content-between h-100">
+                            <div>
+                                {{#if categoria.nome}}
+                                    <span class="badge-category mb-2">{{categoria.nome}}</span>
+                                {{/if}}
+                                <h3 class="h4 news-card-title mb-2">{{titulo}}</h3>
+                                <p class="mb-2 text-muted">{{descricao}}</p>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top small text-muted">
+                                <span>Por <strong>{{autor}}</strong> • {{formatDate date}}</span>
+                                <span>👁 {{views}} • ★ {{likes}}</span>
+                            </div>
+                            <a href="/post/{{slug}}" class="stretched-link"></a>
                         </div>
                     </div>
                 </div>
-            </div>
+            </article>
         {{/each}}
     {{else}}
-        <p>Nenhum resultado encontrado.</p>
+        <div class="card border-0 shadow-sm text-center py-5">
+            <h5 class="fw-bold">Nenhum resultado encontrado para sua pesquisa.</h5>
+            <p class="text-muted small mb-3">Tente buscar por outros termos ou palavras-chave.</p>
+            <div>
+                <a href="/" class="btn btn-yellow px-4">Voltar ao Início</a>
+            </div>
+        </div>
     {{/if}}
 </div>

@@ -1,66 +1,79 @@
 {{#each erros}}
     <div class="alert alert-danger container mt-2">{{texto}}</div>
 {{/each}}
-<div class="container mt-4 mb-4">
-    <h1 class="display-6 fw-bold">Editar Postagem</h1>
-    <hr>
-    <form action="/admin/postagens/edit" method="post" class="row justify-content-center" enctype="multipart/form-data">
-        <input type="hidden" name="id" value="{{postagem._id}}">
-        <div class="row d-flex justify-content-center">
-            <div class="col-12 col-md-4 mb-2 text-start">
-                <label for="titulo">Título: </label>
-                <input type="text" name="titulo" id="titulo" placeholder="Nome da postagem" class="form-control mt-1" value="{{postagem.titulo}}" required>
+<div class="container mt-4 mb-5">
+    <div class="card border-0 shadow-sm p-4" style="border-top: 5px solid #FFB800 !important;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <span class="badge-category mb-1">EDIÇÃO</span>
+                <h1 class="h3 fw-bold mb-0">Editar Publicação</h1>
             </div>
-            <div class="col-12 col-md-4 mb-2 text-start">
-                <label for="slug">Slug: </label>
-                <input type="text" name="slug" id="slug" placeholder="Slug da postagem" class="form-control mt-1" value="{{postagem.slug}}" required>
-            </div>
+            <a href="/admin/postagens" class="btn btn-outline-dark btn-sm">← Voltar</a>
         </div>
-        <div class="row d-flex justify-content-center">
-            <div class="col-12 col-md-8 mb-2 text-start">
-                <label for="descricao">Descrição: </label>
-                <input type="text" name="descricao" id="descricao" placeholder="Descrição da postagem" class="form-control mt-1" value="{{postagem.descricao}}" required>
+        <hr>
+
+        <form action="/admin/postagens/edit" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="id" value="{{postagem._id}}">
+            <div class="row g-3">
+                <div class="col-12 col-md-7">
+                    <label for="titulo" class="form-label fw-bold">Título da Matéria:</label>
+                    <input type="text" name="titulo" id="titulo" class="form-control" value="{{postagem.titulo}}" required>
+                </div>
+                <div class="col-12 col-md-5">
+                    <label for="slug" class="form-label fw-bold">Slug (URL amigável):</label>
+                    <input type="text" name="slug" id="slug" class="form-control" value="{{postagem.slug}}" required>
+                </div>
+
+                <div class="col-12">
+                    <label for="descricao" class="form-label fw-bold">Subtítulo / Resumo:</label>
+                    <input type="text" name="descricao" id="descricao" class="form-control" value="{{postagem.descricao}}" required>
+                </div>
+
+                <div class="col-12">
+                    <label for="conteudo" class="form-label fw-bold">Conteúdo Completo:</label>
+                    <textarea name="conteudo" id="conteudo" cols="30" rows="10" class="form-control">{{postagem.conteudo}}</textarea>
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <label for="autor" class="form-label fw-bold">Autor / Repórter:</label>
+                    <input type="text" name="autor" id="autor" class="form-control" value="{{postagem.autor}}" required>
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <label for="fonte" class="form-label fw-bold">Fonte:</label>
+                    <input type="text" name="fonte" id="fonte" class="form-control" value="{{postagem.fonte}}" required>
+                </div>
+
+                <div class="col-12 col-md-2">
+                    <label for="categoria" class="form-label fw-bold">Editoria:</label>
+                    <select name="categoria" id="categoria" class="form-select" required>
+                        {{#each categorias}}
+                            <option value="{{_id}}" {{#if (eq _id ../postagem.categoria)}}selected{{/if}}>{{nome}}</option>
+                        {{else}}
+                            <option value="0">Nenhuma categoria registrada</option>
+                        {{/each}}
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-2">
+                    <label for="carousel" class="form-label fw-bold">Destaque (Carousel):</label>
+                    <select name="carousel" id="carousel" class="form-select" required>
+                        <option value="true" {{#if postagem.carousel}}selected{{/if}}>Sim (Capa)</option>
+                        <option value="false" {{#unless postagem.carousel}}selected{{/unless}}>Não</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-2">
+                    <label for="file" class="form-label fw-bold">Nova Capa (opcional):</label>
+                    <input type="file" id="file" name="file" accept="image/*" class="form-control">
+                </div>
+
+                <div class="col-12 text-end mt-4">
+                    <button type="submit" class="btn btn-yellow px-5 py-2">Salvar Alterações</button>
+                </div>
             </div>
-        </div>
-        <div class="row d-flex justify-content-center">
-            <div class="col-12 col-md-8 mb-2 text-start">
-                <label for="conteudo">Conteúdo: </label>
-                <textarea name="conteudo" id="conteudo" cols="30" rows="8" placeholder="Conteúdo da postagem" class="form-control">{{postagem.conteudo}}</textarea>
-            </div>
-        </div>
-        <div class="row d-flex justify-content-center">
-            <div class="col-12 col-md-2 mb-2 text-start">
-                <label for="fonte">Fonte: </label>
-                <input type="text" name="fonte" id="fonte" placeholder="Fonte da postagem" class="form-control mt-1" value="{{postagem.fonte}}" required>
-            </div>
-            <div class="col-12 col-md-2 mb-2 text-start">
-                <label for="categoria">Categoria: </label>
-                <select name="categoria" id="categoria" class="form-select mt-1" required>
-                    {{#each categorias}}
-                        <option value="{{_id}}" {{#if (eq _id ../postagem.categoria)}}selected{{/if}}>{{nome}}</option>
-                    {{else}}
-                        <option value="0">Nenhuma categoria registrada</option>
-                    {{/each}}
-                </select>
-            </div>
-            <div class="col-12 col-md-1 mb-2 text-start">
-                <label for="carousel">Carousel: </label>
-                <select name="carousel" id="carousel" class="form-select mt-1" required>
-                    <option value="true" {{#if postagem.carousel}}selected{{/if}}>Sim</option>
-                    <option value="false" {{#unless postagem.carousel}}selected{{/unless}}>Não</option>
-                </select>
-            </div>
-            <div class="col-12 col-md-3 mb-2 text-start">
-                <label for="file">Nova Imagem (opcional):</label>
-                <input type="file" id="file" name="file" accept="image/*" class="form-control mt-1 mb-2">
-            </div>
-        </div>
-        <div class="row d-flex justify-content-center mt-2">
-            <div class="col-12 col-md-4 mb-2 text-center">
-                <input type="submit" class="btn btn-success col-6" value="Editar postagem">
-            </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 <script src="/tinymce/tinymce.min.js"></script>
 <script>

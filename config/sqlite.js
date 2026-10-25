@@ -53,7 +53,19 @@ function generateId() {
     return crypto.randomBytes(12).toString('hex')
 }
 
-// Inicializa tabelas SQLite
+async function ensureColumn(table, column, definition) {
+    try {
+        const cols = await all(`PRAGMA table_info(${table})`)
+        const exists = cols.some((c) => c.name === column)
+        if (!exists) {
+            await run(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`)
+        }
+    } catch (e) {
+        // Ignora se já existir
+    }
+}
+
+// Inicializa tabelas SQLite e migra novas colunas automaticamente
 async function initSqlite() {
     await run(`
         CREATE TABLE IF NOT EXISTS categorias (
@@ -72,12 +84,22 @@ async function initSqlite() {
             descricao TEXT NOT NULL,
             conteudo TEXT NOT NULL,
             fonte TEXT NOT NULL,
+            autor TEXT DEFAULT 'Redação',
             categoria TEXT NOT NULL,
             img TEXT DEFAULT '',
             carousel INTEGER DEFAULT 0,
+            views INTEGER DEFAULT 0,
+            likes INTEGER DEFAULT 0,
+            likedBy TEXT DEFAULT '[]',
             date TEXT NOT NULL
         )
     `)
+
+    // Migração suave para bancos SQLite já criados anteriormente
+    await ensureColumn('postagens', 'autor', "TEXT DEFAULT 'Redação'")
+    await ensureColumn('postagens', 'views', 'INTEGER DEFAULT 0')
+    await ensureColumn('postagens', 'likes', 'INTEGER DEFAULT 0')
+    await ensureColumn('postagens', 'likedBy', "TEXT DEFAULT '[]'")
 
     await run(`
         CREATE TABLE IF NOT EXISTS users (
@@ -106,7 +128,18 @@ async function initSqlite() {
     `)
 }
 
-// Normaliza objeto retornado do SQLite para compatibilidade com o formato Mongoose
+function parseLikedBy(raw) {
+    if (Array.isArray(raw)) return raw.map(String)
+    if (!raw) return []
+    try {
+        const parsed = JSON.parse(raw)
+        return Array.isArray(parsed) ? parsed.map(String) : []
+    } catch (e) {
+        return []
+    }
+}
+
+// Normaliza objetos retornados do SQLite
 function normalizeCategoria(row) {
     if (!row) return null
     return {
@@ -119,6 +152,7 @@ function normalizeCategoria(row) {
 
 function normalizePostagem(row, categoriaObj = null) {
     if (!row) return null
+    const likedBy = parseLikedBy(row.likedBy)
     return {
         _id: String(row._id),
         titulo: row.titulo,
@@ -126,9 +160,13 @@ function normalizePostagem(row, categoriaObj = null) {
         descricao: row.descricao,
         conteudo: row.conteudo,
         fonte: row.fonte,
+        autor: row.autor || 'Redação',
         categoria: categoriaObj || String(row.categoria),
         img: row.img || '',
         carousel: Boolean(row.carousel),
+        views: Number(row.views || 0),
+        likes: Number(row.likes || likedBy.length || 0),
+        likedBy: likedBy,
         date: new Date(row.date)
     }
 }
@@ -214,6 +252,9 @@ class SqliteCategoria {
             lean() {
                 return queryObj
             },
+            populate() {
+                return queryObj
+            },
             then(resolve, reject) {
                 return executor().then(resolve, reject)
             },
@@ -225,21 +266,26 @@ class SqliteCategoria {
     }
 
     static findOne(filter = {}) {
+        let isLean = false
         const executor = async () => {
+            let row = null
             if (filter.slug) {
-                const row = await get('SELECT * FROM categorias WHERE slug = ?', [filter.slug])
-                return normalizeCategoria(row)
+                row = await get('SELECT * FROM categorias WHERE slug = ?', [filter.slug])
+            } else if (filter._id) {
+                row = await get('SELECT * FROM categorias WHERE _id = ?', [String(filter._id)])
+            } else {
+                row = await get('SELECT * FROM categorias LIMIT 1')
             }
-            if (filter._id) {
-                const row = await get('SELECT * FROM categorias WHERE _id = ?', [String(filter._id)])
-                return normalizeCategoria(row)
-            }
-            const row = await get('SELECT * FROM categorias LIMIT 1')
-            return normalizeCategoria(row)
+            if (!row) return null
+            if (isLean) return normalizeCategoria(row)
+            const cat = new SqliteCategoria(row)
+            cat.lean = () => Promise.resolve(normalizeCategoria(row))
+            return cat
         }
 
         const queryObj = {
             lean() {
+                isLean = true
                 return queryObj
             },
             populate() {
@@ -289,6 +335,11 @@ class SqliteCategoria {
     static async findByIdAndDelete(id) {
         return run('DELETE FROM categorias WHERE _id = ?', [String(id)])
     }
+
+    static async countDocuments() {
+        const res = await get('SELECT COUNT(*) AS total FROM categorias')
+        return res ? Number(res.total) : 0
+    }
 }
 
 // -------------------------------------------------------------
@@ -302,22 +353,29 @@ class SqlitePostagem {
         this.descricao = data.descricao || ''
         this.conteudo = data.conteudo || ''
         this.fonte = data.fonte || ''
+        this.autor = data.autor || 'Redação'
         this.categoria = data.categoria ? String(data.categoria._id || data.categoria) : ''
         this.img = data.img || ''
         this.carousel = Boolean(data.carousel)
+        this.views = Number(data.views || 0)
+        this.likedBy = parseLikedBy(data.likedBy)
+        this.likes = Number(data.likes !== undefined ? data.likes : this.likedBy.length)
         this.date = data.date ? new Date(data.date) : new Date()
     }
 
     async save() {
         const existing = await get('SELECT _id FROM postagens WHERE _id = ?', [this._id])
         const carouselInt = this.carousel ? 1 : 0
-        const dateIso = this.date.toISOString()
+        const dateIso = this.date instanceof Date ? this.date.toISOString() : new Date(this.date).toISOString()
+        const likedByJson = JSON.stringify(Array.isArray(this.likedBy) ? this.likedBy : [])
+        const likesCount = Number(this.likes || 0)
+        const viewsCount = Number(this.views || 0)
 
         if (existing) {
             await run(
                 `UPDATE postagens SET
-                    titulo = ?, slug = ?, descricao = ?, conteudo = ?, fonte = ?,
-                    categoria = ?, img = ?, carousel = ?, date = ?
+                    titulo = ?, slug = ?, descricao = ?, conteudo = ?, fonte = ?, autor = ?,
+                    categoria = ?, img = ?, carousel = ?, views = ?, likes = ?, likedBy = ?, date = ?
                  WHERE _id = ?`,
                 [
                     this.titulo,
@@ -325,9 +383,13 @@ class SqlitePostagem {
                     this.descricao,
                     this.conteudo,
                     this.fonte,
+                    this.autor,
                     this.categoria,
                     this.img,
                     carouselInt,
+                    viewsCount,
+                    likesCount,
+                    likedByJson,
                     dateIso,
                     this._id
                 ]
@@ -335,8 +397,8 @@ class SqlitePostagem {
         } else {
             await run(
                 `INSERT INTO postagens (
-                    _id, titulo, slug, descricao, conteudo, fonte, categoria, img, carousel, date
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                    _id, titulo, slug, descricao, conteudo, fonte, autor, categoria, img, carousel, views, likes, likedBy, date
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
                     this._id,
                     this.titulo,
@@ -344,9 +406,13 @@ class SqlitePostagem {
                     this.descricao,
                     this.conteudo,
                     this.fonte,
+                    this.autor,
                     this.categoria,
                     this.img,
                     carouselInt,
+                    viewsCount,
+                    likesCount,
+                    likedByJson,
                     dateIso
                 ]
             )
@@ -373,8 +439,12 @@ class SqlitePostagem {
                 params.push(String(filter.categoria))
             }
 
+            if (filter.likedBy) {
+                conditions.push('p.likedBy LIKE ?')
+                params.push(`%"${String(filter.likedBy)}"%`)
+            }
+
             if (filter.$or && Array.isArray(filter.$or)) {
-                // Filtro de busca por regex/texto
                 const orClauses = []
                 for (const condition of filter.$or) {
                     if (condition.titulo && condition.titulo.$regex) {
@@ -422,7 +492,11 @@ class SqlitePostagem {
                 return queryObj
             },
             sort(criteria) {
-                if (criteria && (criteria.date === 'asc' || criteria.date === 1)) {
+                if (criteria && (criteria.views === 'desc' || criteria.views === -1)) {
+                    sortClause = 'ORDER BY p.views DESC, p.date DESC'
+                } else if (criteria && (criteria.likes === 'desc' || criteria.likes === -1)) {
+                    sortClause = 'ORDER BY p.likes DESC, p.date DESC'
+                } else if (criteria && (criteria.date === 'asc' || criteria.date === 1)) {
                     sortClause = 'ORDER BY p.date ASC'
                 } else {
                     sortClause = 'ORDER BY p.date DESC'
@@ -444,6 +518,7 @@ class SqlitePostagem {
 
     static findOne(filter = {}) {
         let shouldPopulate = false
+        let isLean = false
 
         const executor = async () => {
             let sql = `
@@ -482,7 +557,15 @@ class SqlitePostagem {
                       }
                     : String(row.categoria)
 
-            return normalizePostagem(row, categoriaObj)
+            if (isLean) {
+                return normalizePostagem(row, categoriaObj)
+            }
+            const post = new SqlitePostagem(row)
+            if (shouldPopulate && row.c_id) {
+                post.categoria = categoriaObj
+            }
+            post.lean = () => Promise.resolve(normalizePostagem(row, categoriaObj))
+            return post
         }
 
         const queryObj = {
@@ -491,6 +574,7 @@ class SqlitePostagem {
                 return queryObj
             },
             lean() {
+                isLean = true
                 return queryObj
             },
             then(resolve, reject) {
@@ -562,6 +646,11 @@ class SqlitePostagem {
         return post ? normalizePostagem(post) : null
     }
 
+    static async countDocuments() {
+        const res = await get('SELECT COUNT(*) AS total FROM postagens')
+        return res ? Number(res.total) : 0
+    }
+
     static async createIndexes() {
         return Promise.resolve()
     }
@@ -589,7 +678,7 @@ class SqliteUser {
         const adminInt = this.Admin ? 1 : 0
         const confirmInt = this.confirm ? 1 : 0
         const resetExpStr = this.resetPasswordExpires ? this.resetPasswordExpires.toISOString() : null
-        const dataIso = this.data.toISOString()
+        const dataIso = this.data instanceof Date ? this.data.toISOString() : new Date(this.data).toISOString()
 
         if (existing) {
             await run(
@@ -651,6 +740,9 @@ class SqliteUser {
             lean() {
                 return queryObj
             },
+            populate() {
+                return queryObj
+            },
             then(resolve, reject) {
                 return executor().then(resolve, reject)
             },
@@ -662,31 +754,33 @@ class SqliteUser {
     }
 
     static findOne(filter = {}) {
+        let isLean = false
         const executor = async () => {
+            let row = null
             if (filter.email) {
-                const row = await get('SELECT * FROM users WHERE email = ?', [filter.email.toLowerCase().trim()])
-                return normalizeUser(row)
-            }
-            if (filter.resetPasswordToken) {
-                const row = await get('SELECT * FROM users WHERE resetPasswordToken = ?', [filter.resetPasswordToken])
-                if (!row) return null
-                if (filter.resetPasswordExpires && filter.resetPasswordExpires.$gt) {
+                row = await get('SELECT * FROM users WHERE email = ?', [filter.email.toLowerCase().trim()])
+            } else if (filter.resetPasswordToken) {
+                row = await get('SELECT * FROM users WHERE resetPasswordToken = ?', [filter.resetPasswordToken])
+                if (row && filter.resetPasswordExpires && filter.resetPasswordExpires.$gt) {
                     const expires = row.resetPasswordExpires ? new Date(row.resetPasswordExpires).getTime() : 0
-                    if (expires < Date.now()) return null
+                    if (expires < Date.now()) row = null
                 }
-                const user = new SqliteUser(row)
-                return user
+            } else if (filter._id) {
+                row = await get('SELECT * FROM users WHERE _id = ?', [String(filter._id)])
+            } else {
+                row = await get('SELECT * FROM users LIMIT 1')
             }
-            if (filter._id) {
-                const row = await get('SELECT * FROM users WHERE _id = ?', [String(filter._id)])
-                return normalizeUser(row)
-            }
-            const row = await get('SELECT * FROM users LIMIT 1')
-            return normalizeUser(row)
+
+            if (!row) return null
+            if (isLean) return normalizeUser(row)
+            const user = new SqliteUser(row)
+            user.lean = () => Promise.resolve(normalizeUser(row))
+            return user
         }
 
         const queryObj = {
             lean() {
+                isLean = true
                 return queryObj
             },
             populate() {
@@ -739,6 +833,7 @@ class SqliteUser {
         if (updateData.confirm !== undefined) user.confirm = Boolean(updateData.confirm)
         if (updateData.avatar !== undefined) user.avatar = updateData.avatar
         if (updateData.Admin !== undefined) user.Admin = Boolean(updateData.Admin)
+        if (updateData.nome !== undefined) user.nome = updateData.nome
         await user.save()
         return user
     }
@@ -782,6 +877,9 @@ class SqliteComentario {
             if (filter.postagem) {
                 sql += ' WHERE postagem = ?'
                 params.push(String(filter.postagem))
+            } else if (filter.userId) {
+                sql += ' WHERE userId = ?'
+                params.push(String(filter.userId))
             }
             sql += ' ORDER BY date DESC'
             const rows = await all(sql, params)
@@ -808,11 +906,43 @@ class SqliteComentario {
         return queryObj
     }
 
+    static findById(id) {
+        let isLean = false
+        const executor = async () => {
+            const row = await get('SELECT * FROM comentarios WHERE _id = ?', [String(id)])
+            if (!row) return null
+            if (isLean) return normalizeComentario(row)
+            return new SqliteComentario(row)
+        }
+        const queryObj = {
+            lean() {
+                isLean = true
+                return queryObj
+            },
+            then(resolve, reject) {
+                return executor().then(resolve, reject)
+            },
+            catch(reject) {
+                return executor().catch(reject)
+            }
+        }
+        return queryObj
+    }
+
+    static async findByIdAndDelete(id) {
+        return run('DELETE FROM comentarios WHERE _id = ?', [String(id)])
+    }
+
     static async deleteMany(filter = {}) {
         if (filter.postagem) {
             return run('DELETE FROM comentarios WHERE postagem = ?', [String(filter.postagem)])
         }
         return run('DELETE FROM comentarios')
+    }
+
+    static async countDocuments() {
+        const res = await get('SELECT COUNT(*) AS total FROM comentarios')
+        return res ? Number(res.total) : 0
     }
 }
 

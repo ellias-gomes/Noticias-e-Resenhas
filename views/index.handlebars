@@ -1,37 +1,112 @@
-<div class="container mt-4 mb-4">
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-        <h1 class="display-6 fw-bold mb-0">Últimas Notícias</h1>
-        <div class="d-flex flex-wrap gap-2 mt-2 mt-md-0">
+<div class="container mt-4 mb-5">
+    <!-- Barra de Editorias -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <a href="/" class="category-pill active">Todas as Editorias</a>
             {{#each categorias}}
-                <a href="/categoria/{{slug}}" class="btn btn-outline-dark btn-sm">{{nome}}</a>
+                <a href="/categoria/{{slug}}" class="category-pill">{{nome}}</a>
             {{/each}}
         </div>
+        {{#if isAdmin}}
+            <a href="/admin/postagens/add" class="btn btn-yellow btn-sm px-3">
+                + Nova Matéria
+            </a>
+        {{/if}}
     </div>
-    <hr>
 
-    {{#each postagens}}
-        <div class="card mb-3 text-dark bg-light border-light shadow-sm">
-            <div class="row g-0">
-                <div class="col-md-4">
-                    <img src="{{imageUrl slug 'post'}}" onerror="this.onerror=null;this.src='/img/slide.jpg';" alt="{{titulo}}" class="img-fluid rounded-start w-100" style="aspect-ratio: 2/1; height: 100%; object-fit: cover;">
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        {{#if categoria}}
-                            <span class="badge bg-secondary mb-2">{{categoria.nome}}</span>
-                        {{/if}}
-                        <h3 class="card-title">{{titulo}}</h3>
-                        <p class="mb-2 card-text">{{descricao}}</p>
-                        <small class="text-muted">Data de publicação: {{formatDate date}}</small><br>
-                        <a href="/post/{{slug}}" class="btn stretched-link ms-0"></a>
+    <div class="row g-4">
+        <!-- Coluna Principal: Últimas Notícias -->
+        <div class="col-12 col-lg-8">
+            <div class="section-header">
+                <h2 class="h4 fw-bold mb-0">Últimas Publicações</h2>
+            </div>
+
+            {{#each postagens}}
+                <article class="news-card mb-4 position-relative">
+                    <div class="row g-0">
+                        <div class="col-md-5 news-card-img-wrap">
+                            <img src="{{img}}" onerror="this.onerror=null;this.src='{{imageUrl slug 'post'}}';" alt="{{titulo}}" class="news-card-img">
+                        </div>
+                        <div class="col-md-7">
+                            <div class="card-body p-4 d-flex flex-column justify-content-between h-100">
+                                <div>
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        {{#if categoria.nome}}
+                                            <span class="badge-category">{{categoria.nome}}</span>
+                                        {{else}}
+                                            <span class="badge-category">GERAL</span>
+                                        {{/if}}
+                                        <small class="text-muted fw-semibold">{{readingTime conteudo}}</small>
+                                    </div>
+                                    <h3 class="h5 news-card-title mb-2">{{titulo}}</h3>
+                                    <p class="text-muted small mb-3">{{descricao}}</p>
+                                </div>
+
+                                <div class="d-flex flex-wrap align-items-center justify-content-between pt-2 border-top small text-muted">
+                                    <div>
+                                        <span class="fw-semibold text-dark">{{autor}}</span> • {{formatDate date}}
+                                    </div>
+                                    <div class="d-flex align-items-center gap-3 fw-semibold">
+                                        <span title="Visualizações">👁 {{views}}</span>
+                                        <span title="Curtidas" style="color: #D49600;">★ {{likes}}</span>
+                                    </div>
+                                </div>
+                                <a href="/post/{{slug}}" class="stretched-link" aria-label="Ler {{titulo}}"></a>
+                            </div>
+                        </div>
                     </div>
+                </article>
+            {{else}}
+                <div class="card border-0 shadow-sm text-center py-5 px-3">
+                    <h4 class="fw-bold mb-2">Nenhuma notícia publicada ainda!</h4>
+                    <p class="text-muted mb-3">Acesse o painel administrativo para criar categorias e publicar a primeira matéria.</p>
+                    {{#if isAdmin}}
+                        <div>
+                            <a href="/admin/postagens/add" class="btn btn-yellow px-4">Publicar Primeira Notícia</a>
+                        </div>
+                    {{/if}}
                 </div>
+            {{/each}}
+        </div>
+
+        <!-- Sidebar Lateral: Mais Lidas & Comunidade -->
+        <div class="col-12 col-lg-4">
+            <div class="trending-box mb-4">
+                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-secondary border-opacity-25">
+                    <h4 class="h5 fw-bold mb-0 text-white">
+                        <span style="color: #FFB800;">⚡</span> Mais Lidas & Curtidas
+                    </h4>
+                    <span class="badge bg-warning text-dark">TOP 5</span>
+                </div>
+
+                {{#each trendingPosts}}
+                    <a href="/post/{{slug}}" class="trending-item">
+                        <span class="trending-rank">{{rankNumber @index}}</span>
+                        <div>
+                            <h6 class="fw-bold mb-1 lh-sm">{{titulo}}</h6>
+                            <div class="small text-secondary">
+                                <span>👁 {{views}} leituras</span> • <span style="color: #FFB800;">★ {{likes}} curtidas</span>
+                            </div>
+                        </div>
+                    </a>
+                {{else}}
+                    <p class="text-secondary small mb-0">Ainda não há matérias em destaque.</p>
+                {{/each}}
+            </div>
+
+            <!-- Card Comunidade -->
+            <div class="card border-0 shadow-sm p-4" style="border-top: 4px solid #FFB800 !important;">
+                <h5 class="fw-bold mb-2">Participe da Comunidade</h5>
+                <p class="text-muted small mb-3">
+                    Comente nas matérias, curta suas reportagens favoritas e compartilhe informação verificada com sua rede.
+                </p>
+                {{#if user}}
+                    <a href="/users/usuario/{{userId}}" class="btn btn-dark w-100 fw-semibold">Ver Meu Perfil</a>
+                {{else}}
+                    <a href="/users/registro" class="btn btn-yellow w-100 mb-2">Criar Conta Gratuita</a>
+                    <a href="/users/login" class="btn btn-outline-dark btn-sm w-100">Já tenho uma conta</a>
+                {{/if}}
             </div>
         </div>
-    {{else}}
-        <div class="alert alert-secondary text-center py-4">
-            <h5 class="mb-1">Nenhuma postagem publicada ainda!</h5>
-            <p class="mb-0 text-muted">Acesse o painel de administração para criar categorias e publicar notícias.</p>
-        </div>
-    {{/each}}
+    </div>
 </div>

@@ -8,7 +8,7 @@ const crypto = require('crypto')
 
 const { Admin } = require('../helper/admin')
 const { Register } = require('../helper/register')
-const { User } = require('../models')
+const { User, Postagem, Comentario } = require('../models')
 
 // Configuração do transporte de E-mail (Suporta SendGrid, SMTP ou Modo Local de Desenvolvimento)
 function createMailTransporter() {
@@ -199,7 +199,7 @@ router.post('/registro', (req, res) => {
 
 // Login
 router.get('/login', (req, res) => {
-    res.render('usuario/login', { position: 'fixed' })
+    res.render('usuario/login')
 })
 
 router.post('/login', (req, res, next) => {
@@ -269,8 +269,8 @@ router.post('/edit', Admin, (req, res) => {
         })
 })
 
-// Informações do Usuário (Protegido)
-router.get('/usuario/:id', Register, (req, res) => {
+// Informações do Usuário + Histórico de Curtidas e Comentários
+router.get('/usuario/:id', Register, async (req, res) => {
     if (!req.params.id) {
         req.flash('error_msg', 'ID de usuário inválido.')
         return res.redirect('/')
@@ -284,20 +284,54 @@ router.get('/usuario/:id', Register, (req, res) => {
         return res.redirect('/')
     }
 
-    User.findById(req.params.id)
-        .lean()
-        .then((user) => {
-            if (!user) {
-                req.flash('error_msg', 'Esse usuário não existe.')
-                return res.redirect('/')
-            }
-            res.render('admin/usuarios/info', { user: user, isOwnProfile: isOwnProfile })
-        })
-        .catch((err) => {
-            console.error(err)
+    try {
+        const user = await User.findById(req.params.id).lean()
+        if (!user) {
             req.flash('error_msg', 'Esse usuário não existe.')
-            res.redirect('/')
+            return res.redirect('/')
+        }
+
+        const [meusComentarios, todasPostagens] = await Promise.all([
+            Comentario.find({ userId: String(user._id) }).lean(),
+            Postagem.find().populate('categoria').lean()
+        ])
+
+        const postagensCurtidas = (todasPostagens || []).filter(
+            (p) => Array.isArray(p.likedBy) && p.likedBy.map(String).includes(String(user._id))
+        )
+
+        res.render('admin/usuarios/info', {
+            user: user,
+            isOwnProfile: isOwnProfile,
+            meusComentarios: meusComentarios || [],
+            postagensCurtidas: postagensCurtidas
         })
+    } catch (err) {
+        console.error(err)
+        req.flash('error_msg', 'Esse usuário não existe.')
+        res.redirect('/')
+    }
+})
+
+// Atualizar nome do perfil
+router.post('/perfil/editar', Register, async (req, res) => {
+    const novoNome = (req.body.nome || '').trim()
+    const userId = String(req.user._id)
+
+    if (!novoNome || novoNome.length < 2) {
+        req.flash('error_msg', 'Insira um nome válido!')
+        return res.redirect(`/users/usuario/${userId}`)
+    }
+
+    try {
+        await User.findByIdAndUpdate(userId, { nome: novoNome })
+        req.flash('success_msg', 'Dados do perfil atualizados com sucesso!')
+        res.redirect(`/users/usuario/${userId}`)
+    } catch (err) {
+        console.error(err)
+        req.flash('error_msg', 'Erro ao atualizar perfil.')
+        res.redirect(`/users/usuario/${userId}`)
+    }
 })
 
 // Confirmar E-mail

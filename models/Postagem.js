@@ -22,6 +22,10 @@ const PostagemSchema = new Schema({
         type: String,
         required: true
     },
+    autor: {
+        type: String,
+        default: 'Redação'
+    },
     categoria: {
         type: Schema.Types.ObjectId,
         ref: 'categorias',
@@ -34,6 +38,18 @@ const PostagemSchema = new Schema({
     carousel: {
         type: Boolean,
         default: false
+    },
+    views: {
+        type: Number,
+        default: 0
+    },
+    likes: {
+        type: Number,
+        default: 0
+    },
+    likedBy: {
+        type: [String],
+        default: []
     },
     date: {
         type: Date,

@@ -1,20 +1,30 @@
-<div class="container mt-4">
-    <h1 class="display-6 fw-bold">Entrar em uma conta</h1>
-    <hr>
-    <form action="/users/login" method="post" class="row justify-content-center">
-        <div class="row d-flex justify-content-center">
-            <div class="col-12 col-md-4 mb-2 text-start">
-                <label for="email">E-mail: </label>
-                <input type="email" name="email" id="email" placeholder="E-mail de usuario" class="form-control mt-1 mb-2">
-                <label for="senha">Senha: </label>
-                <input type="password" name="senha" id="senha" placeholder="Senha de usuario" class="form-control mt-1 mb-1">
-                <label for=""><a href="/users/password">Esqueci minha senha</a></label>
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-5">
+            <div class="card border-0 shadow-sm p-4" style="border-top: 5px solid #FFB800 !important;">
+                <div class="text-center mb-3">
+                    <span class="badge-category mb-2">ACESSO À CONTA</span>
+                    <h1 class="h3 fw-bold">Entrar no FocoNews</h1>
+                </div>
+                <form action="/users/login" method="post">
+                    <div class="mb-3">
+                        <label for="email" class="form-label fw-semibold">E-mail:</label>
+                        <input type="email" name="email" id="email" placeholder="seu@email.com" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <label for="senha" class="form-label fw-semibold">Senha:</label>
+                            <a href="/users/password" class="small text-decoration-none fw-semibold" style="color: #B27D00;">Esqueci minha senha</a>
+                        </div>
+                        <input type="password" name="senha" id="senha" placeholder="Sua senha" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-yellow w-100 py-2 mt-2">Acessar Conta</button>
+                </form>
+                <hr class="my-4">
+                <div class="text-center small">
+                    Ainda não tem conta? <a href="/users/registro" class="fw-bold text-dark">Cadastre-se gratuitamente</a>
+                </div>
             </div>
         </div>
-        <div class="row d-flex justify-content-center mt-2">
-            <div class="col-12 col-md-4 mb-2 text-center">
-                <input type="submit" class="btn btn-success col-5" value="Acessar conta">
-            </div>
-        </div>
-    </form>
+    </div>
 </div>

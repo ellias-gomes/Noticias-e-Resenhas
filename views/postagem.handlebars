@@ -1,26 +1,145 @@
-<div class="container mt-4">
-    <h1 class="display-6 fw-bold">{{postagem.titulo}}</h1>
-    <hr>
-    <div class="row">
-        <div class="col-12">
-            <p class="text-center fs-6">{{postagem.descricao}}</p>
+<div class="container mt-4 mb-4">
+    <div class="article-container">
+        <!-- Categoria e Breadcrumb -->
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+            <div>
+                {{#if postagem.categoria.nome}}
+                    <a href="/categoria/{{postagem.categoria.slug}}" class="badge-category">{{postagem.categoria.nome}}</a>
+                {{else}}
+                    <span class="badge-category">NOTÍCIA</span>
+                {{/if}}
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="text-muted small me-1">Tamanho do texto:</span>
+                <button type="button" class="btn btn-outline-dark btn-sm py-0 px-2 fw-bold" onclick="adjustFontSize(-1)" title="Diminuir fonte">A-</button>
+                <button type="button" class="btn btn-outline-dark btn-sm py-0 px-2 fw-bold" onclick="adjustFontSize(1)" title="Aumentar fonte">A+</button>
+            </div>
+        </div>
+
+        <!-- Título e Subtítulo -->
+        <h1 class="display-5 fw-bolder mb-3 lh-sm">{{postagem.titulo}}</h1>
+        <p class="lead text-muted mb-3">{{postagem.descricao}}</p>
+
+        <!-- Barra de Metadados e Ações Rápidas -->
+        <div class="article-meta-bar">
+            <div class="d-flex flex-wrap align-items-center gap-3 small text-muted">
+                <span>Por <strong class="text-dark">{{postagem.autor}}</strong></span>
+                <span>•</span>
+                <span>📅 {{formatDate postagem.date}}</span>
+                <span>•</span>
+                <span>⏱ {{readingTime postagem.conteudo}}</span>
+                <span>•</span>
+                <span>👁 <strong class="text-dark">{{postagem.views}}</strong> visualizações</span>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <form action="/post/{{postagem.slug}}/like" method="POST" id="likeForm" class="m-0">
+                    <button type="submit" id="likeBtn" class="btn-like-action {{#if userLiked}}liked{{/if}}">
+                        <span id="likeIcon">{{#if userLiked}}★{{else}}☆{{/if}}</span>
+                        <span id="likeLabel">{{#if userLiked}}Curtido{{else}}Curtir{{/if}}</span>
+                        <span class="badge bg-dark text-warning rounded-pill ms-1" id="likeCount">{{postagem.likes}}</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Imagem Principal -->
+        <div class="mb-4">
+            <img src="{{postagem.img}}" onerror="this.onerror=null;this.src='{{imageUrl postagem.slug 'post'}}';" alt="{{postagem.titulo}}" class="w-100 rounded-3 shadow-sm" style="max-height: 520px; object-fit: cover;">
+        </div>
+
+        <!-- Conteúdo da Matéria -->
+        <div class="article-body" id="articleBody">
+            {{{postagem.conteudo}}}
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Rodapé da Matéria: Fonte + Barra de Compartilhamento e Curtida -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 bg-light p-3 rounded-3 border">
+            <div class="small">
+                <span class="text-muted">Fonte editorial:</span>
+                <strong class="text-dark ms-1">{{postagem.fonte}}</strong>
+            </div>
+
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <span class="small fw-bold me-1">Compartilhar:</span>
+                <a href="https://api.whatsapp.com/send?text={{encodeURI postagem.titulo}}%20-%20{{encodeURI shareUrl}}" target="_blank" rel="noopener noreferrer" class="share-btn">
+                    WhatsApp
+                </a>
+                <a href="https://twitter.com/intent/tweet?text={{encodeURI postagem.titulo}}&url={{encodeURI shareUrl}}" target="_blank" rel="noopener noreferrer" class="share-btn">
+                    X / Twitter
+                </a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{encodeURI shareUrl}}" target="_blank" rel="noopener noreferrer" class="share-btn">
+                    Facebook
+                </a>
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url={{encodeURI shareUrl}}" target="_blank" rel="noopener noreferrer" class="share-btn">
+                    LinkedIn
+                </a>
+                <button type="button" class="share-btn" id="copyLinkBtn" onclick="copyArticleLink('{{shareUrl}}')">
+                    🔗 <span id="copyLinkText">Copiar Link</span>
+                </button>
+            </div>
         </div>
     </div>
-    <div class="row mb-3">
-        <div class="col-12">
-            <img src="{{imageUrl postagem.slug 'post'}}" onerror="this.onerror=null;this.src='/img/slide.jpg';" alt="{{postagem.descricao}}" class="carousel rounded">
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12">
-            <div>{{{postagem.conteudo}}}</div>
-        </div>
-    </div>
-    <hr>
-    <small>Fonte: {{postagem.fonte}}</small><br>
-    <small>Data de publicação: {{formatDate postagem.date}}</small>
 </div>
-<hr class="container">
+
 {{>_comments}}
-<hr class="container">
 {{>_recomendacoes}}
+
+<script>
+    // Controle de tamanho da fonte do artigo
+    let currentFontScale = 100;
+    function adjustFontSize(direction) {
+        const body = document.getElementById('articleBody');
+        if (!body) return;
+        currentFontScale = Math.min(140, Math.max(85, currentFontScale + direction * 10));
+        body.style.fontSize = currentFontScale + '%';
+    }
+
+    // Copiar link da matéria para a área de transferência
+    function copyArticleLink(url) {
+        const targetUrl = url || window.location.href;
+        navigator.clipboard.writeText(targetUrl).then(function () {
+            const textSpan = document.getElementById('copyLinkText');
+            if (textSpan) {
+                textSpan.textContent = 'Link Copiado!';
+                setTimeout(function () {
+                    textSpan.textContent = 'Copiar Link';
+                }, 2500);
+            }
+        });
+    }
+
+    // Curtir via AJAX sem recarregar a página
+    const likeForm = document.getElementById('likeForm');
+    if (likeForm) {
+        likeForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            try {
+                const res = await fetch(likeForm.action, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await res.json();
+                if (res.status === 401 && data.loginUrl) {
+                    window.location.href = data.loginUrl;
+                    return;
+                }
+                if (res.ok) {
+                    const btn = document.getElementById('likeBtn');
+                    const icon = document.getElementById('likeIcon');
+                    const label = document.getElementById('likeLabel');
+                    const count = document.getElementById('likeCount');
+
+                    btn.classList.toggle('liked', Boolean(data.liked));
+                    icon.textContent = data.liked ? '★' : '☆';
+                    label.textContent = data.liked ? 'Curtido' : 'Curtir';
+                    count.textContent = data.likes;
+                }
+            } catch (err) {
+                likeForm.submit();
+            }
+        });
+    }
+</script>

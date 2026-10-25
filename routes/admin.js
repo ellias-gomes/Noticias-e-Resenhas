@@ -4,11 +4,40 @@ const router = express.Router()
 
 const { Admin } = require('../helper/admin')
 const { upload, uploadImage, deleteImage } = require('../config/storage')
-const { Categoria, Postagem, Comentario } = require('../models')
+const { Categoria, Postagem, User, Comentario } = require('../models')
 
-// Painel Principal Admin
-router.get('/', Admin, (req, res) => {
-    res.render('admin/index', { position: 'fixed' })
+// Painel Principal Admin (Dashboard com estatísticas em tempo real)
+router.get('/', Admin, async (req, res) => {
+    try {
+        const [postagens, categorias, users, totalComentarios] = await Promise.all([
+            Postagem.find().populate('categoria').sort({ date: 'desc' }).lean(),
+            Categoria.find().sort({ date: 'desc' }).lean(),
+            User.find().sort({ data: 'desc' }).lean(),
+            Comentario.countDocuments()
+        ])
+
+        const allPosts = postagens || []
+        const totalViews = allPosts.reduce((acc, p) => acc + Number(p.views || 0), 0)
+        const totalLikes = allPosts.reduce((acc, p) => acc + Number(p.likes || 0), 0)
+
+        res.render('admin/index', {
+            stats: {
+                postagens: allPosts.length,
+                categorias: (categorias || []).length,
+                usuarios: (users || []).length,
+                comentarios: totalComentarios || 0,
+                views: totalViews,
+                likes: totalLikes
+            },
+            recentPosts: allPosts.slice(0, 6)
+        })
+    } catch (err) {
+        console.error(err)
+        res.render('admin/index', {
+            stats: { postagens: 0, categorias: 0, usuarios: 0, comentarios: 0, views: 0, likes: 0 },
+            recentPosts: []
+        })
+    }
 })
 
 // Categorias
@@ -40,7 +69,7 @@ router.post('/categorias/deletar/', Admin, (req, res) => {
 })
 
 router.get('/categorias/add', Admin, (req, res) => {
-    res.render('admin/categoria/addcategorias', { position: 'fixed' })
+    res.render('admin/categoria/addcategorias')
 })
 
 router.post('/categorias/nova', Admin, (req, res) => {
@@ -48,7 +77,6 @@ router.post('/categorias/nova', Admin, (req, res) => {
     const nome = (req.body.nome || '').trim()
     const slug = (req.body.slug || '').trim().toLowerCase().replace(/\s+/g, '-')
 
-    // Validação
     if (!nome) {
         erros.push({ texto: 'Nome inválido!' })
     } else if (nome.length < 2) {
@@ -60,7 +88,7 @@ router.post('/categorias/nova', Admin, (req, res) => {
     }
 
     if (erros.length > 0) {
-        res.render('admin/categoria/addcategorias', { erros: erros, position: 'fixed' })
+        res.render('admin/categoria/addcategorias', { erros: erros })
     } else {
         const novaCategoria = {
             nome: nome,
@@ -89,7 +117,7 @@ router.get('/categorias/edit/:id', Admin, (req, res) => {
                 req.flash('error_msg', 'Essa categoria não existe.')
                 return res.redirect('/admin/categorias')
             }
-            res.render('admin/categoria/editcategorias', { categoria: categoria, position: 'fixed' })
+            res.render('admin/categoria/editcategorias', { categoria: categoria })
         })
         .catch((err) => {
             console.error(err)
@@ -103,7 +131,6 @@ router.post('/categorias/edit', Admin, (req, res) => {
     const nome = (req.body.nome || '').trim()
     const slug = (req.body.slug || '').trim().toLowerCase().replace(/\s+/g, '-')
 
-    // Validação
     if (!nome) {
         erros.push({ texto: 'Nome inválido!' })
     } else if (nome.length <= 2) {
@@ -117,8 +144,7 @@ router.post('/categorias/edit', Admin, (req, res) => {
     if (erros.length > 0) {
         res.render('admin/categoria/editcategorias', {
             erros: erros,
-            categoria: { _id: req.body.id, nome: nome, slug: slug },
-            position: 'fixed'
+            categoria: { _id: req.body.id, nome: nome, slug: slug }
         })
     } else {
         Categoria.findById(req.body.id)
@@ -185,6 +211,7 @@ router.post('/postagens/nova', Admin, (req, res) => {
         const descricao = (req.body.descricao || '').trim()
         const conteudo = (req.body.conteudo || '').trim()
         const fonte = (req.body.fonte || '').trim()
+        const autor = (req.body.autor || (req.user && req.user.nome) || 'Redação').trim()
         const categoria = req.body.categoria
         const carousel = req.body.carousel === 'true'
 
@@ -197,7 +224,7 @@ router.post('/postagens/nova', Admin, (req, res) => {
             erros.push({ texto: 'Categoria inválida, registre uma categoria!' })
         }
         if (!req.file) {
-            erros.push({ texto: 'Selecione uma imagem para a postagem!' })
+            erros.push({ texto: 'Selecione uma imagem de capa para a postagem!' })
         }
 
         if (erros.length > 0) {
@@ -214,13 +241,14 @@ router.post('/postagens/nova', Admin, (req, res) => {
                 descricao: descricao,
                 conteudo: conteudo,
                 fonte: fonte,
+                autor: autor,
                 categoria: categoria,
                 carousel: carousel,
                 img: imageUrl
             }
 
             await new Postagem(novaPostagem).save()
-            req.flash('success_msg', 'Postagem criada com sucesso!')
+            req.flash('success_msg', 'Postagem publicada com sucesso!')
             res.redirect('/admin/postagens')
         } catch (err) {
             console.error('Erro durante o salvamento da postagem:', err)
@@ -280,6 +308,7 @@ router.post('/postagens/edit', Admin, (req, res) => {
             postagem.descricao = (req.body.descricao || postagem.descricao).trim()
             postagem.conteudo = (req.body.conteudo || postagem.conteudo).trim()
             postagem.fonte = (req.body.fonte || postagem.fonte).trim()
+            postagem.autor = (req.body.autor || postagem.autor || 'Redação').trim()
             postagem.categoria = req.body.categoria || postagem.categoria
             postagem.carousel = req.body.carousel === 'true'
 

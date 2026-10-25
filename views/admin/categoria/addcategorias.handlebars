@@ -3,22 +3,44 @@
         {{texto}}
     </div>
 {{/each}}
-<div class="container mt-4">
-    <h1 class="display-6 fw-bold">Nova Categoria</h1>
-    <hr>
-    <form action="/admin/categorias/nova" method="post" class="row justify-content-center">
-        <div class="row d-flex justify-content-center">
-            <div class="col-12 col-md-6 mb-2 text-start">
-                <label for="nome">Nome: </label>
-                <input type="text" name="nome" id="nome" placeholder="Nome da categoria" class="form-control mt-1 mb-2">
-                <label for="slug">Slug: </label>
-                <input type="text" name="slug" id="slug" placeholder="Slug da categoria" class="form-control  mt-1 mb-2">
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-6">
+            <div class="card border-0 shadow-sm p-4" style="border-top: 5px solid #FFB800 !important;">
+                <span class="badge-category mb-1">EDITORIAS</span>
+                <h1 class="h3 fw-bold mb-3">Nova Categoria</h1>
+                <hr class="mt-0">
+                <form action="/admin/categorias/nova" method="post">
+                    <div class="mb-3">
+                        <label for="nome" class="form-label fw-bold">Nome da Editoria:</label>
+                        <input type="text" name="nome" id="nome" placeholder="Ex: Tecnologia, Esportes, Economia" class="form-control" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="slug" class="form-label fw-bold">Slug da Editoria:</label>
+                        <input type="text" name="slug" id="slug" placeholder="ex: tecnologia" class="form-control" required>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="/admin/categorias" class="btn btn-outline-dark">Cancelar</a>
+                        <button type="submit" class="btn btn-yellow px-4">Criar Categoria</button>
+                    </div>
+                </form>
             </div>
         </div>
-        <div class="row d-flex justify-content-center">
-            <div class="col-12 col-md-4 mb-4 text-center">
-                <input type="submit" class="btn btn-success col-5" value="Criar categoria">
-            </div>
-        </div>
-    </form>
+    </div>
 </div>
+<script>
+    const nomeInput = document.getElementById('nome');
+    const slugInput = document.getElementById('slug');
+    if (nomeInput && slugInput) {
+        nomeInput.addEventListener('input', function () {
+            slugInput.value = nomeInput.value
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9\s-]/g, '')
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-');
+        });
+    }
+</script>

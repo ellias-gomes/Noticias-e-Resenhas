@@ -1,29 +1,86 @@
-<div class="container mt-4 mb-4">
-    <h1 class="display-6 fw-bold">{{user.nome}}</h1>
-    <hr>
-    <div class="row align-items-start">
-        <div class="col-12 col-md-6 col-lg-3 mb-3">
-            <h4>Nome de usuário:</h4>
-            <p>{{user.nome}}</p>
+<div class="container mt-4 mb-5">
+    <!-- Cabeçalho do Perfil -->
+    <div class="card border-0 shadow-sm p-4 mb-4" style="border-top: 5px solid #FFB800 !important;">
+        <div class="row align-items-center g-4">
+            <div class="col-12 col-md-auto text-center">
+                <img src="{{imageUrl user._id 'user'}}" onerror="this.onerror=null;this.src='/img/icon.svg';" alt="Imagem de perfil" class="imgUser rounded-circle">
+            </div>
+            <div class="col-12 col-md">
+                <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                    <h1 class="h2 fw-bold mb-0">{{user.nome}}</h1>
+                    {{#if user.Admin}}
+                        <span class="badge-category">ADMINISTRADOR</span>
+                    {{else}}
+                        <span class="badge bg-dark">LEITOR</span>
+                    {{/if}}
+                </div>
+                <p class="text-muted mb-2">✉ {{user.email}} • Membro desde {{formatDate user.data}}</p>
+
+                {{#if isOwnProfile}}
+                    <div class="row g-3 mt-2 pt-3 border-top">
+                        <div class="col-12 col-lg-6">
+                            <form action="/users/perfil/editar" method="POST" class="d-flex gap-2">
+                                <input type="text" name="nome" value="{{user.nome}}" class="form-control form-control-sm" placeholder="Seu nome" required>
+                                <button type="submit" class="btn btn-dark btn-sm text-nowrap">Salvar Nome</button>
+                            </form>
+                        </div>
+                        <div class="col-12 col-lg-6">
+                            <form action="/uploadperfil" method="POST" enctype="multipart/form-data" class="d-flex gap-2">
+                                <input type="file" id="file" name="file" accept="image/*" class="form-control form-control-sm" required>
+                                <button type="submit" class="btn btn-yellow btn-sm text-nowrap">Trocar Foto</button>
+                            </form>
+                        </div>
+                    </div>
+                {{/if}}
+            </div>
         </div>
-        <div class="col-12 col-md-6 col-lg-3 mb-3">
-            <h4>E-mail do usuário:</h4>
-            <p>{{user.email}}</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Notícias Curtidas pelo Usuário -->
+        <div class="col-12 col-lg-6">
+            <div class="section-header">
+                <h4 class="h5 fw-bold mb-0">★ Publicações Curtidas ({{postagensCurtidas.length}})</h4>
+            </div>
+            <div class="d-flex flex-column gap-3">
+                {{#each postagensCurtidas}}
+                    <div class="card news-card p-3 position-relative">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                {{#if categoria.nome}}
+                                    <span class="badge-category mb-1">{{categoria.nome}}</span>
+                                {{/if}}
+                                <h6 class="fw-bold mb-1">{{titulo}}</h6>
+                                <small class="text-muted">{{formatDate date}} • 👁 {{views}}</small>
+                            </div>
+                            <a href="/post/{{slug}}" class="btn btn-yellow btn-sm stretched-link">Ler</a>
+                        </div>
+                    </div>
+                {{else}}
+                    <div class="card border-0 shadow-sm p-4 text-center text-muted">
+                        Nenhuma notícia curtida ainda.
+                    </div>
+                {{/each}}
+            </div>
         </div>
-        <div class="col-12 col-md-6 col-lg-3 mb-3">
-            <h4>Data de criação:</h4>
-            <p>{{formatDate user.data}}</p>
-        </div>
-        <div class="col-12 col-md-6 col-lg-3 mb-3">
-            <h4>Imagem de perfil:</h4>
-            <img src="{{imageUrl user._id 'user'}}" onerror="this.onerror=null;this.src='/img/icon.svg';" alt="Imagem de perfil" class="imgUser rounded mb-3 d-block">
-            {{#if isOwnProfile}}
-                <form action="/uploadperfil" method="POST" enctype="multipart/form-data">
-                    <label for="file" class="form-label small">Alterar foto de perfil:</label>
-                    <input type="file" id="file" name="file" accept="image/*" class="form-control form-control-sm mb-2" required>
-                    <input type="submit" value="Atualizar Foto" class="btn btn-dark btn-sm w-100">
-                </form>
-            {{/if}}
+
+        <!-- Comentários Recentes do Usuário -->
+        <div class="col-12 col-lg-6">
+            <div class="section-header">
+                <h4 class="h5 fw-bold mb-0">💬 Comentários Realizados ({{meusComentarios.length}})</h4>
+            </div>
+            <div class="d-flex flex-column gap-3">
+                {{#each meusComentarios}}
+                    <div class="comment-card">
+                        <div class="small text-muted mb-1">{{formatDate date}}</div>
+                        <p class="mb-0 fw-medium">"{{comentario}}"</p>
+                    </div>
+                {{else}}
+                    <div class="card border-0 shadow-sm p-4 text-center text-muted">
+                        Nenhum comentário publicado ainda.
+                    </div>
+                {{/each}}
+            </div>
         </div>
     </div>
 </div>

@@ -1,51 +1,88 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-            <img src="/img/newspaper-regular.svg" alt="" width="30" height="24">
+<nav class="navbar navbar-expand-lg navbar-dark navbar-editorial sticky-top">
+    <div class="container">
+        <a class="brand-logo-box me-4" href="/">
+            <span class="brand-icon-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 512 512"><path d="M96 96c0-35.3 28.7-64 64-64H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H80c-44.2 0-80-35.8-80-80V128c0-17.7 14.3-32 32-32s32 14.3 32 32V400c0 8.8 7.2 16 16 16s16-7.2 16-16V96zm64 24v80c0 13.3 10.7 24 24 24H296c13.3 0 24-10.7 24-24V120c0-13.3-10.7-24-24-24H184c-13.3 0-24 10.7-24 24zm208-8c0 8.8 7.2 16 16 16h48c8.8 0 16-7.2 16-16s-7.2-16-16-16H384c-8.8 0-16 7.2-16 16zm0 96c0 8.8 7.2 16 16 16h48c8.8 0 16-7.2 16-16s-7.2-16-16-16H384c-8.8 0-16 7.2-16 16zM160 304c0 8.8 7.2 16 16 16H432c8.8 0 16-7.2 16-16s-7.2-16-16-16H176c-8.8 0-16 7.2-16 16zm0 96c0 8.8 7.2 16 16 16H432c8.8 0 16-7.2 16-16s-7.2-16-16-16H176c-8.8 0-16 7.2-16 16z"/></svg>
+            </span>
+            <span class="brand-title">FOCO<span>NEWS</span></span>
         </a>
-        <a class="navbar-brand fw-bold" href="/">Notícias</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Alternar navegação">
             <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-lg-center gap-1">
                 <li class="nav-item">
-                    <a class="nav-link fw-bold" href="/admin">Admin</a>
+                    <a class="nav-link" href="/">Início</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle fw-bold" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Categorias
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownCategorias" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Editorias
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownCategorias">
                         {{#each categorias}}
                             <li><a class="dropdown-item" href="/categoria/{{slug}}">{{nome}}</a></li>
-                            {{else}}
-                                <li><p class="dropdown-item mb-0 pe-none">Nenhuma categoria</p></li>
+                        {{else}}
+                            <li><span class="dropdown-item-text text-muted small">Nenhuma categoria</span></li>
                         {{/each}}
                     </ul>
                 </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle fw-bold" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Perfil
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        {{#if user}}
-                            <li><a class="dropdown-item" href="/users/usuario/{{userId}}">Minha conta</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/users/sair">Sair</a></li>
-                            {{else}}
-                                <li><a class="dropdown-item" href="/users/registro">Registro</a></li>
-                                <li><a class="dropdown-item" href="/users/login">Login</a></li>
-                        {{/if}}
-                    </ul>
-                </li>
+                {{#if isAdmin}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">
+                            <span class="badge bg-warning text-dark me-1">ADMIN</span>Painel
+                        </a>
+                    </li>
+                {{/if}}
             </ul>
-            <form class="d-flex" action="/search" method="get">
-                <input class="form-control me-2" type="search" placeholder="Pesquisar..." aria-label="Pesquisar..." name="pesquisa">
-                <button class="btn btn-dark pt-0" type="submit">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><style>svg{fill:#ffffff}</style><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>
-                </button>
+
+            <form class="d-flex me-lg-3 my-2 my-lg-0 search-group-editorial" action="/search" method="get">
+                <div class="input-group">
+                    <input class="form-control" type="search" placeholder="Buscar matérias..." aria-label="Buscar matérias" name="pesquisa" value="{{searchTerm}}">
+                    <button class="btn btn-yellow px-3" type="submit" title="Pesquisar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 512 512"><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>
+                    </button>
+                </div>
             </form>
+
+            <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0">
+                {{#if user}}
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light btn-sm dropdown-toggle d-flex align-items-center gap-2 py-1 px-3 rounded-pill" type="button" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{imageUrl user._id 'user'}}" onerror="this.onerror=null;this.src='/img/icon.svg';" alt="Avatar" width="24" height="24" class="rounded-circle" style="object-fit: cover; border: 1.5px solid #FFB800;">
+                            <span class="fw-semibold">{{user.nome}}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuDropdown">
+                            <li><a class="dropdown-item" href="/users/usuario/{{userId}}">Meu Perfil</a></li>
+                            {{#if isAdmin}}
+                                <li><a class="dropdown-item" href="/admin">Painel Administrativo</a></li>
+                                <li><a class="dropdown-item" href="/admin/postagens/add">Nova Publicação</a></li>
+                            {{/if}}
+                            <li><hr class="dropdown-divider border-secondary"></li>
+                            <li><a class="dropdown-item text-danger fw-bold" href="/users/sair">Sair da conta</a></li>
+                        </ul>
+                    </div>
+                {{else}}
+                    <a href="/users/login" class="btn btn-outline-light btn-sm px-3 fw-semibold">Entrar</a>
+                    <a href="/users/registro" class="btn btn-yellow btn-sm px-3">Criar Conta</a>
+                {{/if}}
+            </div>
         </div>
     </div>
 </nav>
+
+{{#if postagens.length}}
+<div class="breaking-ticker py-2">
+    <div class="container d-flex align-items-center gap-3 overflow-hidden">
+        <span class="breaking-badge">EM ALTA</span>
+        <div class="d-flex align-items-center gap-4 text-truncate">
+            {{#each trendingPosts}}
+                <a href="/post/{{slug}}" class="breaking-link text-truncate">
+                    <span style="color: #FFB800;">●</span> {{titulo}}
+                </a>
+            {{/each}}
+        </div>
+    </div>
+</div>
+{{/if}}
